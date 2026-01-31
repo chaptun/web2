@@ -1016,11 +1016,15 @@
                     <button class="btn btn-primary" onclick="applyChanges()" style="width: 100%;">
                         ✨ บันทึกให้คนอื่นเห็น (เซฟแชร์ได้)
                     </button>
-                    <button class="btn" style="background: #4CAF50; color: white;" onclick="generateShareLink()">
-                        🔗 สร้างลิงก์แบบจำรูปภาพ (ลิงก์จะยาวมาก)
-                    </button>
+                    <div id="shareInfo" style="display: none; width: 100%; background: #e8f5e9; padding: 20px; border-radius: 15px; margin: 10px 0;">
+                        <p style="margin-bottom: 10px; color: #2e7d32; font-weight: 600;">🎉 บันทึกสำเร็จ! ลิงก์แชร์:</p>
+                        <input type="text" id="shareUrl" readonly style="width: 100%; padding: 10px; border: 2px solid #4caf50; border-radius: 10px; font-size: 0.9em; margin-bottom: 10px;">
+                        <button class="btn" style="background: #4caf50; color: white; width: 100%;" onclick="copyShareLink()">
+                            📋 คัดลอกลิงก์
+                        </button>
+                    </div>
                     <button class="btn" style="background: #FF9800; color: white;" onclick="generateAndShorten()">
-                        🚀 สร้างลิงก์และย่อให้สั้นอัตโนมัติ
+                        🚀 สร้างลิงก์แบบฝังรูป + ย่อลิงก์
                     </button>
                     <button class="btn btn-secondary" onclick="doReset()">
                         🔄 รีเซ็ต
@@ -1036,26 +1040,95 @@
         let selectedImageIndex = -1;
         const DEFAULT_PASSWORD = '1234';
         
-        // ระบบเซฟข้อมูลให้คนอื่นเห็น ผ่าน window.storage
+        // ระบบเซฟข้อมูลให้คนอื่นเห็น - ใช้ Pastebin
+        let PASTE_ID = localStorage.getItem('giftbox_paste_id') || null;
+        
         const storage = {
-            async get(key) {
+            async getAll() {
                 try {
-                    const result = await window.storage.get(key, true); // shared = true
-                    return result ? JSON.parse(result.value) : null;
+                    if (!PASTE_ID) return {};
+                    
+                    const response = await fetch(`https://pastebin.com/raw/${PASTE_ID}`);
+                    if (!response.ok) return {};
+                    
+                    const text = await response.text();
+                    return JSON.parse(text);
                 } catch (e) {
-                    console.log('Get error (key may not exist):', key);
-                    return null;
+                    console.log('Load error:', e);
+                    // ถ้าโหลดไม่ได้ ลองใช้ localStorage
+                    return this.getFromLocal();
                 }
             },
-            async set(key, value) {
+            
+            getFromLocal() {
+                const data = {};
+                ['images', 'message_title', 'message_text', 'color1', 'color2', 'color3', 'admin_password'].forEach(key => {
+                    const value = localStorage.getItem('giftbox_' + key);
+                    if (value) {
+                        try {
+                            data[key] = JSON.parse(value);
+                        } catch {
+                            data[key] = value;
+                        }
+                    }
+                });
+                return data;
+            },
+            
+            async saveToServer(allData) {
+                // บันทึกลง localStorage ก่อนเสมอ
+                Object.keys(allData).forEach(key => {
+                    localStorage.setItem('giftbox_' + key, JSON.stringify(allData[key]));
+                });
+                
                 try {
-                    await window.storage.set(key, JSON.stringify(value), true); // shared = true
-                    return true;
+                    // ใช้ GitHub Gist แทน (ไม่ต้อง API Key)
+                    const response = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            description: 'Giftbox Data',
+                            public: false,
+                            files: {
+                                'giftbox-data.json': {
+                                    content: JSON.stringify(allData)
+                                }
+                            }
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        PASTE_ID = result.id;
+                        localStorage.setItem('giftbox_paste_id', PASTE_ID);
+                        console.log('Saved to Gist:', PASTE_ID);
+                        return true;
+                    }
                 } catch (e) {
-                    console.error('Save error:', e);
-                    alert('❌ เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่');
-                    return false;
+                    console.log('Server save failed, using localStorage only');
                 }
+                
+                return true; // อย่างน้อยก็บันทึกใน localStorage แล้ว
+            },
+            
+            async set(key, value) {
+                // อัพเดท localStorage ทันที
+                localStorage.setItem('giftbox_' + key, JSON.stringify(value));
+                return true;
+            },
+            
+            async get(key) {
+                const value = localStorage.getItem('giftbox_' + key);
+                if (value) {
+                    try {
+                        return JSON.parse(value);
+                    } catch {
+                        return value;
+                    }
+                }
+                return null;
             }
         };
 
@@ -1340,29 +1413,27 @@
             loadingBtn.textContent = '⏳ กำลังบันทึก...';
             
             try {
-                // บันทึกข้อความ
+                // รวบรวมข้อมูลทั้งหมด
                 const title = document.getElementById('titleInput').value;
                 const message = document.getElementById('messageInput').value;
-                await storage.set('message_title', title);
-                await storage.set('message_text', message);
-                
-                // บันทึกสี
                 const color1 = document.getElementById('color1').value;
                 const color2 = document.getElementById('color2').value;
                 const color3 = document.getElementById('color3').value;
-                await storage.set('color1', color1);
-                await storage.set('color2', color2);
-                await storage.set('color3', color3);
-                
-                // บันทึกรูปภาพ
-                await storage.set('images', images);
-                
-                // บันทึกรหัสผ่าน
                 const newPassword = document.getElementById('newPassword').value.trim();
-                if (newPassword) {
-                    await storage.set('admin_password', newPassword);
-                    document.getElementById('newPassword').value = '';
-                }
+                
+                const allData = {
+                    message_title: title,
+                    message_text: message,
+                    color1: color1,
+                    color2: color2,
+                    color3: color3,
+                    images: images,
+                    admin_password: newPassword || await storage.get('admin_password') || DEFAULT_PASSWORD
+                };
+                
+                // บันทึกทั้งหมด
+                loadingBtn.textContent = '⏳ กำลังบันทึกไปเซิร์ฟเวอร์...';
+                const saved = await storage.saveToServer(allData);
                 
                 // อัพเดท UI
                 document.getElementById('messageTitle').textContent = title;
@@ -1371,13 +1442,41 @@
                 document.documentElement.style.setProperty('--secondary', color2);
                 document.documentElement.style.setProperty('--accent', color3);
                 
-                alert('✨ บันทึกเรียบร้อย! ทุกคนที่เปิดเว็บนี้จะเห็นข้อมูลที่คุณบันทึก');
-                switchView('surprise');
+                if (newPassword) {
+                    document.getElementById('newPassword').value = '';
+                }
+                
+                // แสดงลิงก์แชร์
+                if (PASTE_ID) {
+                    const shareUrl = window.location.origin + window.location.pathname + '?gist=' + PASTE_ID;
+                    document.getElementById('shareUrl').value = shareUrl;
+                    document.getElementById('shareInfo').style.display = 'block';
+                    alert('✨ บันทึกเรียบร้อย!\n\n📋 ลิงก์แชร์ปรากฏด้านล่าง\n\nส่งลิงก์นี้ให้คนอื่นเพื่อดูเซอร์ไพรส์!');
+                } else {
+                    alert('✨ บันทึกเรียบร้อย!\n\n⚠️ ยังไม่สามารถสร้างลิงก์แชร์ได้\nแต่ข้อมูลถูกบันทึกในเครื่องของคุณแล้ว\n\n💡 ใช้ปุ่ม "สร้างลิงก์แบบฝังรูป" เพื่อสร้างลิงก์แชร์');
+                }
+                
             } catch (e) {
                 alert('❌ เกิดข้อผิดพลาด: ' + e.message);
             } finally {
                 loadingBtn.disabled = false;
                 loadingBtn.textContent = originalText;
+            }
+        }
+        
+        function copyShareLink() {
+            const shareUrl = document.getElementById('shareUrl');
+            shareUrl.select();
+            shareUrl.setSelectionRange(0, 99999); // สำหรับมือถือ
+            
+            // ลองใช้ Clipboard API ใหม่ก่อน
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl.value).then(() => {
+                    alert('✅ คัดลอกลิงก์แล้ว! นำไปแชร์ให้คนอื่นได้เลย');
+                });
+            } else {
+                document.execCommand('copy');
+                alert('✅ คัดลอกลิงก์แล้ว! นำไปแชร์ให้คนอื่นได้เลย');
             }
         }
 
@@ -1410,10 +1509,26 @@
             loadingIndicator.classList.add('show');
             
             try {
+                // ลองโหลดจาก URL parameter ก่อน (ถ้ามีคนแชร์ gist ID มา)
+                const urlParams = new URLSearchParams(window.location.search);
+                const sharedGistId = urlParams.get('gist');
+                if (sharedGistId) {
+                    PASTE_ID = sharedGistId;
+                    localStorage.setItem('giftbox_paste_id', PASTE_ID);
+                    console.log('Using shared Gist:', PASTE_ID);
+                }
+                
+                // โหลดข้อมูลทั้งหมด
+                let allData = await storage.getAll();
+                
+                // ถ้าโหลดจาก server ไม่ได้ ให้ใช้ localStorage
+                if (!allData || Object.keys(allData).length === 0) {
+                    allData = storage.getFromLocal();
+                }
+                
                 // โหลดรูปภาพ
-                const savedImages = await storage.get('images');
-                if (savedImages && Array.isArray(savedImages)) {
-                    images = savedImages;
+                if (allData.images && Array.isArray(allData.images)) {
+                    images = allData.images;
                     renderGallery();
                     if (images.length > 0) {
                         displayCurrentImage();
@@ -1421,34 +1536,32 @@
                 }
                 
                 // โหลดข้อความ
-                const savedTitle = await storage.get('message_title');
-                const savedMessage = await storage.get('message_text');
-                if (savedTitle) {
-                    document.getElementById('titleInput').value = savedTitle;
-                    document.getElementById('messageTitle').textContent = savedTitle;
+                if (allData.message_title) {
+                    const title = allData.message_title;
+                    document.getElementById('titleInput').value = title;
+                    document.getElementById('messageTitle').textContent = title;
                 }
-                if (savedMessage) {
-                    document.getElementById('messageInput').value = savedMessage;
-                    document.getElementById('messageText').innerHTML = savedMessage.replace(/\n/g, '<br>');
+                if (allData.message_text) {
+                    const message = allData.message_text;
+                    document.getElementById('messageInput').value = message;
+                    document.getElementById('messageText').innerHTML = message.replace(/\n/g, '<br>');
                 }
                 
                 // โหลดสี
-                const savedColor1 = await storage.get('color1');
-                const savedColor2 = await storage.get('color2');
-                const savedColor3 = await storage.get('color3');
+                if (allData.color1) {
+                    document.getElementById('color1').value = allData.color1;
+                    document.documentElement.style.setProperty('--primary', allData.color1);
+                }
+                if (allData.color2) {
+                    document.getElementById('color2').value = allData.color2;
+                    document.documentElement.style.setProperty('--secondary', allData.color2);
+                }
+                if (allData.color3) {
+                    document.getElementById('color3').value = allData.color3;
+                    document.documentElement.style.setProperty('--accent', allData.color3);
+                }
                 
-                if (savedColor1) {
-                    document.getElementById('color1').value = savedColor1;
-                    document.documentElement.style.setProperty('--primary', savedColor1);
-                }
-                if (savedColor2) {
-                    document.getElementById('color2').value = savedColor2;
-                    document.documentElement.style.setProperty('--secondary', savedColor2);
-                }
-                if (savedColor3) {
-                    document.getElementById('color3').value = savedColor3;
-                    document.documentElement.style.setProperty('--accent', savedColor3);
-                }
+                console.log('Data loaded successfully');
             } catch (e) {
                 console.log('Loading data:', e);
             } finally {
@@ -1456,30 +1569,7 @@
             }
         }
 
-        // ฟังก์ชันสำหรับสร้างลิงก์แชร์ (แบบเก่า - สำหรับกรณีที่ต้องการรูปในลิงก์)
-        function generateShareLink() {
-            const data = {
-                t: document.getElementById('titleInput').value,
-                m: document.getElementById('messageInput').value,
-                c1: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),
-                c2: getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim(),
-                c3: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
-                i: images
-            };
-
-            try {
-                const jsonStr = JSON.stringify(data);
-                const compressed = LZString.compressToEncodedURIComponent(jsonStr);
-                const shareUrl = window.location.origin + window.location.pathname + '?v=' + compressed;
-                
-                navigator.clipboard.writeText(shareUrl);
-                alert('✅ คัดลอกลิงก์แล้ว!\n\n⚠️ ลิงก์นี้ยาวมาก เพราะมีรูปภาพอยู่ในลิงก์\n\nแนะนำ: ใช้ปุ่ม "บันทึกให้คนอื่นเห็น" แทน แล้วแชร์ลิงก์หน้าเว็บปกติ');
-            } catch (e) {
-                alert('❌ รูปภาพเยอะเกินไป ลองลดจำนวนรูป หรือใช้ปุ่ม "บันทึกให้คนอื่นเห็น" แทน');
-            }
-        }
-
-        // ฟังก์ชันย่อลิงก์อัตโนมัติ
+        // ฟังก์ชันย่อลิงก์อัตโนมัติ - สำหรับกรณีที่ต้องการฝังรูปในลิงก์
         async function generateAndShorten() {
             const data = {
                 t: document.getElementById('titleInput').value,
