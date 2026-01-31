@@ -1001,6 +1001,9 @@
                     <button class="btn btn-primary" onclick="applyChanges()">
                         ✨ บันทึกการเปลี่ยนแปลง
                     </button>
+                    <button class="btn" style="background: #4CAF50; color: white; width: 100%; margin-bottom: 10px;" onclick="generateAndShorten()">
+    🚀 สร้างลิงก์และย่อให้สั้นอัตโนมัติ
+</button>
                     <button class="btn btn-secondary" onclick="doReset()">
                         🔄 รีเซ็ต
                     </button>
@@ -1435,53 +1438,61 @@
                 closePasswordModal();
             }
         }
-        // ฟังก์ชันสำหรับสร้างลิงก์ (จะเก็บข้อมูล ข้อความ และ สี ลงใน URL)
-// ฟังก์ชันสำหรับสร้างลิงก์ที่ "รวมรูปภาพ" เข้าไปด้วย
-function generateShareLink() {
+// ฟังก์ชันสร้างลิงก์ บีบอัด และพาไปหน้าย่อลิงก์
+async function generateAndShorten() {
     const data = {
-        title: document.getElementById('titleInput').value,
-        msg: document.getElementById('messageInput').value,
-        c1: document.getElementById('color1').value,
-        c2: document.getElementById('color2').value,
-        c3: document.getElementById('color3').value,
-        imgs: images 
+        t: document.getElementById('titleInput').value,
+        m: document.getElementById('messageInput').value,
+        c1: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),
+        c2: getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim(),
+        c3: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+        i: images // ข้อมูลรูปภาพทั้งหมด
     };
 
-    // บีบอัดข้อมูลให้เล็กลงที่สุด
-    const jsonStr = JSON.stringify(data);
-    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
-    const shareUrl = window.location.origin + window.location.pathname + '?v=' + compressed;
+    try {
+        const jsonStr = JSON.stringify(data);
+        const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+        // สร้างลิงก์ยาวที่มีข้อมูลครบ
+        const longUrl = window.location.origin + window.location.pathname + '?v=' + compressed;
 
-    navigator.clipboard.writeText(shareUrl).then(() => {
-        alert('✨ ย่อขนาดข้อมูลและคัดลอกลิงก์แล้ว! \n(หากยังยาวไป แนะนำให้เอาไปวางในเว็บ Bitly อีกทีนะครับ)');
-    });
+        // คัดลอกลิงก์ยาวลง Clipboard ให้ก่อน
+        await navigator.clipboard.writeText(longUrl);
+        
+        alert('✅ สร้างข้อมูลสำเร็จ!\nระบบก๊อปปี้ลิงก์ยาวให้แล้ว กำลังพาไปหน้าย่อลิงก์...\n\n👉 ให้คุณกด "วาง" (Ctrl+V) ในเว็บที่กำลังจะเปิดได้เลย');
+        
+        // เปิดเว็บย่อลิงก์
+        window.open('https://www.shorturl.asia/th/', '_blank');
+    } catch (e) {
+        alert('รูปภาพอาจเยอะเกินไป ลองลดจำนวนรูปลงนะครับ');
+    }
 }
 
-// แก้ไขฟังก์ชันโหลดข้อมูลตอนเปิดเว็บ
+// ฟังก์ชันโหลดข้อมูลกลับมาเมื่อมีคนเปิดลิงก์
 function loadConfigFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const v = urlParams.get('v'); // ใช้ตัวแปร v แทน config
+    const v = urlParams.get('v');
     
     if (v) {
         try {
             const decompressed = LZString.decompressFromEncodedURIComponent(v);
-            const decodedData = JSON.parse(decompressed);
+            const data = JSON.parse(decompressed);
             
-            // บันทึกข้อมูลลงเครื่อง
-            localStorage.setItem('messageTitle', decodedData.title);
-            localStorage.setItem('messageText', decodedData.msg);
-            localStorage.setItem('color1', decodedData.c1);
-            localStorage.setItem('color2', decodedData.c2);
-            localStorage.setItem('color3', decodedData.c3);
-            localStorage.setItem('surprise_images', JSON.stringify(decodedData.imgs));
+            if(data.t) localStorage.setItem('messageTitle', data.t);
+            if(data.m) localStorage.setItem('messageText', data.m);
+            if(data.c1) localStorage.setItem('color1', data.c1);
+            if(data.c2) localStorage.setItem('color2', data.c2);
+            if(data.c3) localStorage.setItem('color3', data.c3);
+            if(data.i) localStorage.setItem('images', JSON.stringify(data.i));
             
-            // ล้าง URL ให้สะอาดแล้วแสดงผล
+            // ล้าง URL ให้สวยงามแล้วเริ่มใหม่
             window.location.href = window.location.pathname;
         } catch (e) {
-            console.error('Error:', e);
+            console.error('Data error:', e);
         }
     }
 }
+
+
 
     </script>
 </body>
