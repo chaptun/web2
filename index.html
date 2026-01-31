@@ -779,6 +779,7 @@
             justify-content: center;
             margin-top: 30px;
         }
+        
 
         .btn {
             padding: 15px 40px;
@@ -1003,6 +1004,18 @@
                         🔄 รีเซ็ต
                     </button>
                 </div>
+                <div class="action-buttons">
+    <button class="btn" style="background: #4CAF50; color: white;" onclick="generateShareLink()">
+        🔗 สร้างลิงก์สำหรับแชร์
+    </button>
+    
+    <button class="btn btn-primary" onclick="applyChanges()">
+        ✨ บันทึกการเปลี่ยนแปลง
+    </button>
+    <button class="btn btn-secondary" onclick="doReset()">
+        🔄 รีเซ็ต
+    </button>
+</div>
             </div>
         </div>
     </div>
@@ -1404,6 +1417,7 @@
         }
 
         window.onload = function() {
+            loadConfigFromUrl();
             createFloatingHearts();
             loadSavedData();
             updatePasswordDisplay();
@@ -1415,6 +1429,50 @@
                 closePasswordModal();
             }
         }
+        // ฟังก์ชันสำหรับสร้างลิงก์ (จะเก็บข้อมูล ข้อความ และ สี ลงใน URL)
+function generateShareLink() {
+    const data = {
+        title: document.getElementById('titleInput').value,
+        msg: document.getElementById('messageInput').value,
+        c1: document.getElementById('color1').value,
+        c2: document.getElementById('color2').value,
+        c3: document.getElementById('color3').value
+    };
+
+    // แปลงข้อมูลเป็นรหัสเพื่อต่อท้าย URL
+    const jsonStr = JSON.stringify(data);
+    const encodedData = btoa(encodeURIComponent(jsonStr));
+    const shareUrl = window.location.origin + window.location.pathname + '?config=' + encodedData;
+    
+    // คัดลอกลิงก์ลง Clipboard
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('✅ คัดลอกลิงก์สำหรับเซฟข้อมูลแล้ว!\nคุณสามารถส่งลิงก์นี้ให้คนอื่น หรือเก็บไว้เปิดเองได้เลย');
+    });
+}
+
+// ฟังก์ชันสำหรับอ่านข้อมูลจากลิงก์เมื่อเปิดหน้าเว็บ
+function loadConfigFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const config = urlParams.get('config');
+    
+    if (config) {
+        try {
+            const decodedData = JSON.parse(decodeURIComponent(atob(config)));
+            
+            // เซฟลงเครื่องทันทีเพื่อให้ระบบเดิมทำงานต่อได้
+            if(decodedData.title) localStorage.setItem('messageTitle', decodedData.title);
+            if(decodedData.msg) localStorage.setItem('messageText', decodedData.msg);
+            if(decodedData.c1) localStorage.setItem('color1', decodedData.c1);
+            if(decodedData.c2) localStorage.setItem('color2', decodedData.c2);
+            if(decodedData.c3) localStorage.setItem('color3', decodedData.c3);
+            
+            // รีโหลดข้อมูลเข้า UI
+            loadSavedData(); 
+        } catch (e) {
+            console.error('Error loading config:', e);
+        }
+    }
+}
     </script>
 </body>
 </html>
