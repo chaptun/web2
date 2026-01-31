@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 เซอร์ไพรส์สำหรับคนพิเศษ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Sarabun:wght@300;400;600&family=Mitr:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #C44569;
+            --accent: #FFC0CB;
+            --bg1: #FFE5EC;
+            --bg2: #FFF0F5;
+            --text: #5A3E5E;
+            --white: #FFFFFF;
+            --shadow: rgba(255, 107, 157, 0.3);
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, #FFE8F0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            color: var(--text);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 192, 203, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 218, 224, 0.4) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 20px;
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.15;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(5deg); }
+            50% { transform: translateY(-60px) rotate(-5deg); }
+            75% { transform: translateY(-30px) rotate(3deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-family: 'Mitr', sans-serif;
+            font-size: 3.5em;
+            font-weight: 600;
+            color: #FF1493;
+            margin-bottom: 10px;
+            text-shadow: 
+                2px 2px 4px rgba(255, 20, 147, 0.3),
+                0 0 20px rgba(255, 105, 180, 0.5),
+                0 0 40px rgba(255, 182, 193, 0.3);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { 
+                text-shadow: 
+                    2px 2px 4px rgba(255, 20, 147, 0.3),
+                    0 0 20px rgba(255, 105, 180, 0.5),
+                    0 0 40px rgba(255, 182, 193, 0.3);
+            }
+            to { 
+                text-shadow: 
+                    2px 2px 8px rgba(255, 20, 147, 0.5),
+                    0 0 30px rgba(255, 105, 180, 0.8),
+                    0 0 60px rgba(255, 182, 193, 0.6);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: var(--secondary);
+            font-weight: 300;
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .toggle-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .toggle-btn:not(.active) {
+            background: white;
+            color: var(--primary);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .content-wrapper {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-wrapper.active {
+            display: block;
+        }
+
+        .surprise-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 80px;
+            padding: 40px 20px 100px;
+            min-height: calc(100vh - 300px);
+        }
+
+        .gift-container {
+            perspective: 1000px;
+            width: 300px;
+            height: 300px;
+            position: relative;
+        }
+
+        .gift-box {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            cursor: pointer;
+        }
+
+        .gift-box.opening {
+            animation: boxShake 0.5s ease;
+        }
+
+        @keyframes boxShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .box-body {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 20px 50px var(--shadow);
+            border: 4px solid var(--accent);
+        }
+
+        .box-lid {
+            position: absolute;
+            width: 220px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            border-radius: 20px 20px 10px 10px;
+            left: 50%;
+            top: 20%;
+            transform: translate(-50%, -50%);
+            transform-origin: bottom;
+            transition: all 0.8s ease;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 4px solid var(--accent);
+            z-index: 10;
+        }
+
+        .gift-box.opened .box-lid {
+            transform: translate(-50%, -150%) rotateX(-100deg);
+            opacity: 0.5;
+        }
+
+        .ribbon-v, .ribbon-h {
+            position: absolute;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .ribbon-v {
+            width: 30px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ribbon-h {
+            width: 100%;
+            height: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .bow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            z-index: 11;
+            animation: bowBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bowBounce {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        .click-hint {
+            text-align: center;
+            margin-top: 20px;
+            font-family: 'Mitr', sans-serif;
+            color: var(--secondary);
+            font-size: 1.1em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        .globe-container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1s ease;
+            display: none;
+            margin-bottom: 60px;
+        }
+
+        .globe-container.show {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+            animation: globeAppear 1s ease forwards;
+        }
+
+        @keyframes globeAppear {
+            0% { transform: scale(0.5) translateY(50px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .globe {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: 
+                linear-gradient(135deg, rgba(255, 182, 193, 0.3) 0%, rgba(255, 192, 203, 0.2) 100%),
+                linear-gradient(135deg, #FFE4E9 0%, #FFF0F5 50%, #FFE8F0 100%);
+            box-shadow: 
+                0 0 0 8px rgba(255, 255, 255, 0.5),
+                0 0 0 12px rgba(255, 182, 193, 0.3),
+                inset -25px -25px 40px rgba(255, 192, 203, 0.2),
+                0 25px 60px rgba(255, 107, 157, 0.4),
+                0 0 80px rgba(255, 182, 193, 0.3);
+            overflow: hidden;
+            animation: rotate3d 20s linear infinite;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg) rotateX(15deg); }
+            100% { transform: rotateY(360deg) rotateX(15deg); }
+        }
+
+        .globe-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            object-fit: cover;
+            opacity: 0.95;
+            cursor: pointer;
+        }
+
+        .globe-image:hover {
+            opacity: 1;
+        }
+
+        .image-controls {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px var(--shadow);
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .globe::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .message-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px var(--shadow);
+            border: 3px solid var(--accent);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease 0.5s;
+            display: none;
+        }
+
+        .message-box.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .message-box h2 {
+            font-family: 'Mitr', sans-serif;
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message-box p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            color: var(--text);
+            font-weight: 400;
+        }
+
+        .hearts-decoration {
+            margin: 20px 0;
+            font-size: 2em;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Password Modal */
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .password-modal.active {
+            display: flex;
+        }
+
+        .password-box {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .password-box h2 {
+            font-family: 'Mitr', sans-serif;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            font-size: 1.2em;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--shadow);
+        }
+
+        .password-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .password-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 15px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: var(--text);
+        }
+
+        .password-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px var(--shadow);
+            border: 3px solid var(--accent);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .panel-section {
+            margin-bottom: 40px;
+        }
+
+        .panel-section h3 {
+            font-family: 'Mitr', sans-serif;
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1em;
+            color: var(--text);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--shadow);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .color-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .color-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-group input[type="color"] {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--accent);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .color-group input[type="color"]:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .color-group span {
+            font-family: 'Kanit', sans-serif;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .file-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #ff4444;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .gallery-item:hover .remove-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .gallery-item .remove-btn:hover {
+            background: #cc0000;
+            transform: scale(1.15);
+        }
+
+        .gallery-item .remove-btn:active {
+            transform: scale(1.05);
+            background: #aa0000;
+        }
+
+        .gallery-item.active {
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 20px var(--shadow);
+        }
+
+        .image-position-controls {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 240, 245, 0.5);
+            border-radius: 15px;
+        }
+
+        .position-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .gift-container { width: 250px; height: 250px; }
+            .globe-container { 
+                width: 300px; 
+                height: 300px;
+                margin-bottom: 80px;
+            }
+            .globe-image { width: 220px; height: 220px; }
+            .control-panel { padding: 25px; }
+            .color-inputs { grid-template-columns: 1fr; }
+            .surprise-view {
+                gap: 60px;
+                padding-bottom: 80px;
+            }
+            .image-controls {
+                bottom: -70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <div class="container">
+        <header>
+            <h1>🎁 เซอร์ไพรส์สุดพิเศษ 🎁</h1>
+            <p class="subtitle">สำหรับคนที่รักที่สุด ❤️</p>
+        </header>
+
+        <div class="view-toggle">
+            <button class="toggle-btn active" onclick="switchView('surprise')">
+                🎁 เซอร์ไพรส์
+            </button>
+            <button class="toggle-btn" onclick="requestPassword()">
+                🔒 ปรับแต่ง
+            </button>
+        </div>
+
+        <div class="password-modal" id="passwordModal">
+            <div class="password-box">
+                <h2>🔐 ใส่รหัสผ่าน</h2>
+                <p style="color: var(--text); margin-bottom: 20px;">กรุณาใส่รหัสเพื่อเข้าสู่โหมดปรับแต่ง</p>
+                <input type="password" class="password-input" id="passwordInput" placeholder="รหัสผ่าน" onkeypress="if(event.key==='Enter') checkPassword()">
+                <p class="error-message" id="errorMessage">❌ รหัสผ่านไม่ถูกต้อง</p>
+                <div class="password-buttons">
+                    <button class="btn-cancel" onclick="closePasswordModal()">ยกเลิก</button>
+                    <button class="btn-confirm" onclick="checkPassword()">ยืนยัน</button>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.85em; color: #999;">
+                    💡 รหัสเริ่มต้น: <strong>1234</strong><br>
+                    (เปลี่ยนได้ในโหมดปรับแต่ง)
+                </p>
+            </div>
+        </div>
+
+        <div class="content-wrapper active" id="surpriseView">
+            <div class="surprise-view">
+                <div class="gift-container">
+                    <div class="gift-box" id="giftBox" onclick="openGift()">
+                        <div class="bow">🎀</div>
+                        <div class="box-lid"></div>
+                        <div class="box-body">
+                            <div class="ribbon-v"></div>
+                            <div class="ribbon-h"></div>
+                        </div>
+                    </div>
+                    <p class="click-hint" id="clickHint">👆 คลิกเพื่อเปิดของขวัญ</p>
+                </div>
+
+                <div class="globe-container" id="globeContainer">
+                    <div class="globe">
+                        <img src="" alt="Globe" class="globe-image" id="globeImage" onclick="nextImage()">
+                    </div>
+                    <div class="image-controls">
+                        <button class="control-btn" onclick="prevImage()" title="รูปก่อนหน้า">◀</button>
+                        <button class="control-btn" onclick="nextImage()" title="รูปถัดไป">▶</button>
+                        <span style="padding: 0 10px; display: flex; align-items: center; color: var(--text); font-weight: 500;" id="imageCounter">1/1</span>
+                    </div>
+                </div>
+
+                <div class="message-box" id="messageBox">
+                    <h2 id="messageTitle">สำหรับคนพิเศษ</h2>
+                    <div class="hearts-decoration">💕 ❤️ 💖</div>
+                    <p id="messageText">
+                        คุณคือทุกสิ่งทุกอย่างของฉัน<br>
+                        รักคุณมากที่สุดในโลก ❤️
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper" id="controlView">
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>📸 รูปภาพ</h3>
+                    <div class="form-group">
+                        <label>อัพโหลดรูปแฟน (หลายรูปได้)</label>
+                        <div class="file-upload">
+                            <input type="file" id="imageInput" accept="image/*" multiple>
+                            <label for="imageInput" class="file-upload-btn">
+                                📁 เลือกรูปภาพ (เลือกได้หลายรูป)
+                            </label>
+                        </div>
+                        <div class="image-gallery" id="imageGallery"></div>
+                        
+                        <div class="image-position-controls" id="positionControls" style="display: none;">
+                            <h4 style="margin-bottom: 15px; color: var(--primary); font-family: 'Kanit', sans-serif;">
+                                🎯 ปรับตำแหน่งรูปที่เลือก
+                            </h4>
+                            <div>
+                                <div class="slider-label">
+                                    <span>ซูม</span>
+                                    <span id="scaleValue">100%</span>
+                                </div>
+                                <input type="range" class="position-slider" id="scaleSlider" min="50" max="200" value="100">
+                            </div>
+                            <div>
+                                <div class="slider-label">
+                                    <span>แนวนอน</span>
+                                    <span id="xValue">0</span>
+                                </div>
+                                <input type="range" class="position-slider" id="xSlider" min="-50" max="50" value="0">
+                            </div>
+                            <div>
+                                <div class="slider-label">
+                                    <span>แนวตั้ง</span>
+                                    <span id="yValue">0</span>
+                                </div>
+                                <input type="range" class="position-slider" id="ySlider" min="-50" max="50" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>💌 ข้อความ</h3>
+                    <div class="form-group">
+                        <label>หัวข้อข้อความ</label>
+                        <input type="text" id="titleInput" value="สำหรับคนพิเศษ">
+                    </div>
+                    <div class="form-group">
+                        <label>ข้อความเซอร์ไพรส์</label>
+                        <textarea id="messageInput">คุณคือทุกสิ่งทุกอย่างของฉัน
+รักคุณมากที่สุดในโลก ❤️</textarea>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎨 ปรับสี</h3>
+                    <div class="color-inputs">
+                        <div class="color-group">
+                            <input type="color" id="color1" value="#FF6B9D">
+                            <span>สีหลัก 1</span>
+                        </div>
+                        <div class="color-group">
+                            <input type="color" id="color2" value="#C44569">
+                            <span>สีหลัก 2</span>
+                        </div>
+                        <div class="color-group">
+                            <input type="color" id="color3" value="#FFC0CB">
+                            <span>สีเน้น</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🔐 รหัสผ่าน</h3>
+                    <div class="form-group">
+                        <label>เปลี่ยนรหัสผ่านสำหรับโหมดปรับแต่ง</label>
+                        <input type="text" id="newPassword" placeholder="รหัสผ่านใหม่ (เว้นว่างถ้าไม่ต้องการเปลี่ยน)">
+                        <p style="font-size: 0.9em; color: #999; margin-top: 5px;">
+                            💡 รหัสผ่านปัจจุบัน: <strong id="currentPassword">****</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="applyChanges()">
+                        ✨ บันทึกการเปลี่ยนแปลง
+                    </button>
+                    <button class="btn btn-secondary" onclick="doReset()">
+                        🔄 รีเซ็ต
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let images = [];
+        let currentImageIndex = 0;
+        let selectedImageIndex = -1;
+        const DEFAULT_PASSWORD = '1234';
+
+        function createFloatingHearts() {
+            const heartsBg = document.getElementById('heartsBg');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💘'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-float';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                heartsBg.appendChild(heart);
+            }
+        }
+
+        function requestPassword() {
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('passwordInput').focus();
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        function checkPassword() {
+            const inputPassword = document.getElementById('passwordInput').value;
+            const savedPassword = localStorage.getItem('adminPassword') || DEFAULT_PASSWORD;
+            
+            if (inputPassword === savedPassword) {
+                closePasswordModal();
+                switchView('control');
+            } else {
+                document.getElementById('errorMessage').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('errorMessage').classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function updatePasswordDisplay() {
+            const savedPassword = localStorage.getItem('adminPassword') || DEFAULT_PASSWORD;
+            document.getElementById('currentPassword').textContent = '•'.repeat(savedPassword.length);
+        }
+
+        function switchView(view) {
+            const surpriseView = document.getElementById('surpriseView');
+            const controlView = document.getElementById('controlView');
+            const buttons = document.querySelectorAll('.toggle-btn');
+
+            if (view === 'surprise') {
+                surpriseView.classList.add('active');
+                controlView.classList.remove('active');
+                buttons[0].classList.add('active');
+                buttons[1].classList.remove('active');
+            } else {
+                surpriseView.classList.remove('active');
+                controlView.classList.add('active');
+                buttons[0].classList.remove('active');
+                buttons[1].classList.add('active');
+                updatePasswordDisplay();
+            }
+        }
+
+        let isOpened = false;
+        function openGift() {
+            if (isOpened) return;
+            
+            const giftBox = document.getElementById('giftBox');
+            const clickHint = document.getElementById('clickHint');
+            const globeContainer = document.getElementById('globeContainer');
+            const messageBox = document.getElementById('messageBox');
+
+            giftBox.classList.add('opening');
+            
+            setTimeout(() => {
+                giftBox.classList.add('opened');
+                clickHint.style.display = 'none';
+                
+                setTimeout(() => {
+                    globeContainer.classList.add('show');
+                    displayCurrentImage();
+                    
+                    setTimeout(() => {
+                        messageBox.classList.add('show');
+                    }, 800);
+                }, 500);
+            }, 500);
+
+            isOpened = true;
+        }
+
+        // Image Upload with Event Listener
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        src: e.target.result,
+                        scale: 100,
+                        x: 0,
+                        y: 0
+                    };
+                    images.push(imageData);
+                    saveImages();
+                    renderGallery();
+                    
+                    if (images.length === 1) {
+                        displayCurrentImage();
+                    }
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Slider Event Listeners
+        document.getElementById('scaleSlider').addEventListener('input', updateImagePosition);
+        document.getElementById('xSlider').addEventListener('input', updateImagePosition);
+        document.getElementById('ySlider').addEventListener('input', updateImagePosition);
+
+        function renderGallery() {
+            const gallery = document.getElementById('imageGallery');
+            gallery.innerHTML = '';
+            
+            images.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item' + (index === selectedImageIndex ? ' active' : '');
+                item.dataset.index = index;
+                
+                const imgEl = document.createElement('img');
+                imgEl.src = img.src;
+                imgEl.alt = `Image ${index + 1}`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '×';
+                removeBtn.setAttribute('type', 'button');
+                removeBtn.dataset.index = index;
+                
+                item.appendChild(imgEl);
+                item.appendChild(removeBtn);
+                gallery.appendChild(item);
+            });
+
+            updateImageCounter();
+        }
+        
+        // ใช้ Event Delegation แทน
+        document.addEventListener('DOMContentLoaded', function() {
+            const gallery = document.getElementById('imageGallery');
+            
+            gallery.addEventListener('click', function(e) {
+                // ถ้ากดปุ่มลบ
+                if (e.target.classList.contains('remove-btn')) {
+                    e.stopPropagation();
+                    const index = parseInt(e.target.dataset.index);
+                    console.log('Delete button clicked for index:', index);
+                    removeImageFunc(index);
+                }
+                // ถ้ากดที่รูป
+                else if (e.target.closest('.gallery-item')) {
+                    const item = e.target.closest('.gallery-item');
+                    const index = parseInt(item.dataset.index);
+                    console.log('Gallery item clicked:', index);
+                    selectImage(index);
+                }
+            });
+        });
+
+        let isDeleting = false;
+        
+        function removeImageFunc(index) {
+            // ป้องกันการเรียกซ้ำ
+            if (isDeleting) {
+                console.log('Already deleting, skipping...');
+                return;
+            }
+            
+            isDeleting = true;
+            console.log('Removing image at index:', index);
+            
+            if (!confirm('ต้องการลบรูปนี้ใช่ไหม?')) {
+                isDeleting = false;
+                return;
+            }
+            
+            // ลบรูปออกจาก array
+            images.splice(index, 1);
+            
+            // ปรับ selectedImageIndex
+            if (selectedImageIndex === index) {
+                selectedImageIndex = -1;
+                document.getElementById('positionControls').style.display = 'none';
+            } else if (selectedImageIndex > index) {
+                selectedImageIndex--;
+            }
+            
+            // ปรับ currentImageIndex
+            if (currentImageIndex >= images.length && images.length > 0) {
+                currentImageIndex = images.length - 1;
+            } else if (images.length === 0) {
+                currentImageIndex = 0;
+                const globeImg = document.getElementById('globeImage');
+                globeImg.src = '';
+            }
+            
+            // บันทึกและอัพเดท UI
+            saveImages();
+            renderGallery();
+            
+            // แสดงรูปปัจจุบันถ้ายังมีรูป
+            if (images.length > 0) {
+                displayCurrentImage();
+            } else {
+                updateImageCounter();
+            }
+            
+            console.log('Images after delete:', images.length);
+            
+            // รีเซ็ต flag หลังจากเสร็จ
+            setTimeout(() => {
+                isDeleting = false;
+            }, 300);
+        }
+
+        function selectImage(index) {
+            selectedImageIndex = index;
+            renderGallery();
+            
+            const controls = document.getElementById('positionControls');
+            controls.style.display = 'block';
+            
+            const img = images[index];
+            document.getElementById('scaleSlider').value = img.scale;
+            document.getElementById('xSlider').value = img.x;
+            document.getElementById('ySlider').value = img.y;
+            updateImagePosition();
+        }
+
+        function updateImagePosition() {
+            if (selectedImageIndex === -1) return;
+            
+            const scale = document.getElementById('scaleSlider').value;
+            const x = document.getElementById('xSlider').value;
+            const y = document.getElementById('ySlider').value;
+            
+            images[selectedImageIndex].scale = scale;
+            images[selectedImageIndex].x = x;
+            images[selectedImageIndex].y = y;
+            
+            document.getElementById('scaleValue').textContent = scale + '%';
+            document.getElementById('xValue').textContent = x;
+            document.getElementById('yValue').textContent = y;
+            
+            saveImages();
+        }
+
+        function displayCurrentImage() {
+            if (images.length === 0) return;
+            
+            const img = images[currentImageIndex];
+            const globeImg = document.getElementById('globeImage');
+            globeImg.src = img.src;
+            globeImg.style.transform = `translate(-50%, -50%) translate(${img.x}%, ${img.y}%) scale(${img.scale / 100})`;
+            
+            updateImageCounter();
+        }
+
+        function nextImage() {
+            if (images.length === 0) return;
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            displayCurrentImage();
+        }
+
+        function prevImage() {
+            if (images.length === 0) return;
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            displayCurrentImage();
+        }
+
+        function updateImageCounter() {
+            const counter = document.getElementById('imageCounter');
+            if (images.length > 0) {
+                counter.textContent = `${currentImageIndex + 1}/${images.length}`;
+            } else {
+                counter.textContent = '0/0';
+            }
+        }
+
+        function saveImages() {
+            localStorage.setItem('images', JSON.stringify(images));
+        }
+
+        function loadImages() {
+            const saved = localStorage.getItem('images');
+            if (saved) {
+                images = JSON.parse(saved);
+                renderGallery();
+                if (images.length > 0) {
+                    displayCurrentImage();
+                }
+            }
+        }
+
+        function applyChanges() {
+            const title = document.getElementById('titleInput').value;
+            const message = document.getElementById('messageInput').value;
+            document.getElementById('messageTitle').textContent = title;
+            document.getElementById('messageText').innerHTML = message.replace(/\n/g, '<br>');
+            
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+            const color3 = document.getElementById('color3').value;
+            
+            document.documentElement.style.setProperty('--primary', color1);
+            document.documentElement.style.setProperty('--secondary', color2);
+            document.documentElement.style.setProperty('--accent', color3);
+            
+            localStorage.setItem('messageTitle', title);
+            localStorage.setItem('messageText', message);
+            localStorage.setItem('color1', color1);
+            localStorage.setItem('color2', color2);
+            localStorage.setItem('color3', color3);
+            
+            const newPassword = document.getElementById('newPassword').value.trim();
+            if (newPassword) {
+                localStorage.setItem('adminPassword', newPassword);
+                document.getElementById('newPassword').value = '';
+            }
+            
+            alert('✨ บันทึกการเปลี่ยนแปลงเรียบร้อย!');
+            switchView('surprise');
+        }
+
+        function doReset() {
+            console.log('Reset button clicked');
+            const confirmed = confirm('🔄 คุณต้องการรีเซ็ตเป็นค่าเริ่มต้นใช่ไหม?\n\n⚠️ ข้อมูลทั้งหมดจะถูกลบ รวมถึง:\n- รูปภาพทั้งหมด\n- ข้อความที่แก้ไข\n- สีที่กำหนด\n- รหัสผ่าน');
+            
+            if (confirmed) {
+                console.log('User confirmed reset');
+                localStorage.clear();
+                images = [];
+                currentImageIndex = 0;
+                selectedImageIndex = -1;
+                
+                // Force reload
+                setTimeout(() => {
+                    window.location.href = window.location.href;
+                }, 100);
+            } else {
+                console.log('User cancelled reset');
+            }
+        }
+
+        function loadSavedData() {
+            loadImages();
+            
+            const savedTitle = localStorage.getItem('messageTitle');
+            const savedMessage = localStorage.getItem('messageText');
+            if (savedTitle) {
+                document.getElementById('titleInput').value = savedTitle;
+                document.getElementById('messageTitle').textContent = savedTitle;
+            }
+            if (savedMessage) {
+                document.getElementById('messageInput').value = savedMessage;
+                document.getElementById('messageText').innerHTML = savedMessage.replace(/\n/g, '<br>');
+            }
+            
+            const savedColor1 = localStorage.getItem('color1');
+            const savedColor2 = localStorage.getItem('color2');
+            const savedColor3 = localStorage.getItem('color3');
+            
+            if (savedColor1) {
+                document.getElementById('color1').value = savedColor1;
+                document.documentElement.style.setProperty('--primary', savedColor1);
+            }
+            if (savedColor2) {
+                document.getElementById('color2').value = savedColor2;
+                document.documentElement.style.setProperty('--secondary', savedColor2);
+            }
+            if (savedColor3) {
+                document.getElementById('color3').value = savedColor3;
+                document.documentElement.style.setProperty('--accent', savedColor3);
+            }
+        }
+
+        window.onload = function() {
+            createFloatingHearts();
+            loadSavedData();
+            updatePasswordDisplay();
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (event.target === modal) {
+                closePasswordModal();
+            }
+        }
+    </script>
+</body>
+</html>
