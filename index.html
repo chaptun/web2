@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎁 กล่องหรรษา อิอิ</title>
@@ -1437,70 +1438,47 @@
         // ฟังก์ชันสำหรับสร้างลิงก์ (จะเก็บข้อมูล ข้อความ และ สี ลงใน URL)
 // ฟังก์ชันสำหรับสร้างลิงก์ที่ "รวมรูปภาพ" เข้าไปด้วย
 function generateShareLink() {
-    // แสดง loading เพราะรูปเยอะอาจจะช้า
-    const originalText = event.target.innerText;
-    event.target.innerText = "⏳ กำลังประมวลผลรูปภาพ...";
-    event.target.disabled = true;
-
-    // รวบรวมข้อมูลทุกอย่างรวมถึง Array ของรูปภาพ (ซึ่งเก็บเป็น Base64 อยู่แล้ว)
     const data = {
         title: document.getElementById('titleInput').value,
         msg: document.getElementById('messageInput').value,
         c1: document.getElementById('color1').value,
         c2: document.getElementById('color2').value,
         c3: document.getElementById('color3').value,
-        imgs: images // ดึงรูปทั้งหมดที่มีในเครื่องตอนนั้นใส่ลงไป
+        imgs: images 
     };
 
-    try {
-        const jsonStr = JSON.stringify(data);
-        // ใช้ LZString หรือการเข้ารหัสที่ปลอดภัย (ในที่นี้ใช้ Base64 แบบรองรับภาษาไทย)
-        const encodedData = btoa(encodeURIComponent(jsonStr));
-        
-        // สร้าง URL (มันจะยาวมากกกกกก)
-        const shareUrl = window.location.origin + window.location.pathname + '?config=' + encodedData;
-        
-        // ลองคัดลอกลง Clipboard
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            alert('✅ สร้างลิงก์สำเร็จ! ลิงก์นี้จะจำทั้ง ข้อความ สี และ "รูปภาพ" ของคุณไว้หมดแล้ว \n\n(หมายเหตุ: ลิงก์มีความยาวมาก กรุณาส่งผ่านแชทที่รองรับข้อความยาวๆ นะครับ)');
-        }).catch(err => {
-            // ถ้าคัดลอกอัตโนมัติไม่ได้ ให้แสดงเป็นหน้าต่างให้ก๊อปเอง
-            prompt("ก๊อปปี้ลิงก์ด้านล่างนี้ไปใช้ได้เลยครับ:", shareUrl);
-        });
-    } catch (e) {
-        alert('❌ รูปภาพของคุณอาจจะเยอะหรือขนาดใหญ่เกินไป ลองลดจำนวนรูปลงดูครับ');
-        console.error(e);
-    } finally {
-        event.target.innerText = originalText;
-        event.target.disabled = false;
-    }
+    // บีบอัดข้อมูลให้เล็กลงที่สุด
+    const jsonStr = JSON.stringify(data);
+    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+    const shareUrl = window.location.origin + window.location.pathname + '?v=' + compressed;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('✨ ย่อขนาดข้อมูลและคัดลอกลิงก์แล้ว! \n(หากยังยาวไป แนะนำให้เอาไปวางในเว็บ Bitly อีกทีนะครับ)');
+    });
 }
 
 // แก้ไขฟังก์ชันโหลดข้อมูลตอนเปิดเว็บ
 function loadConfigFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const config = urlParams.get('config');
+    const v = urlParams.get('v'); // ใช้ตัวแปร v แทน config
     
-    if (config) {
+    if (v) {
         try {
-            const decodedData = JSON.parse(decodeURIComponent(atob(config)));
+            const decompressed = LZString.decompressFromEncodedURIComponent(v);
+            const decodedData = JSON.parse(decompressed);
             
-            // อัดข้อมูลลง LocalStorage ของเครื่องใหม่ทันที
-            if(decodedData.title) localStorage.setItem('messageTitle', decodedData.title);
-            if(decodedData.msg) localStorage.setItem('messageText', decodedData.msg);
-            if(decodedData.c1) localStorage.setItem('color1', decodedData.c1);
-            if(decodedData.c2) localStorage.setItem('color2', decodedData.c2);
-            if(decodedData.c3) localStorage.setItem('color3', decodedData.c3);
+            // บันทึกข้อมูลลงเครื่อง
+            localStorage.setItem('messageTitle', decodedData.title);
+            localStorage.setItem('messageText', decodedData.msg);
+            localStorage.setItem('color1', decodedData.c1);
+            localStorage.setItem('color2', decodedData.c2);
+            localStorage.setItem('color3', decodedData.c3);
+            localStorage.setItem('surprise_images', JSON.stringify(decodedData.imgs));
             
-            // "ดึงรูป" จากลิงก์มาเซฟลงเครื่องใหม่
-            if(decodedData.imgs && Array.isArray(decodedData.imgs)) {
-                localStorage.setItem('surprise_images', JSON.stringify(decodedData.imgs));
-            }
-            
-            // สั่งให้หน้าเว็บโหลดข้อมูลที่เพิ่งเซฟไปมาแสดงผล
-            location.href = window.location.pathname; // รีโหลดหน้าแบบไม่มี ?config เพื่อล้าง URL ให้สะอาด
+            // ล้าง URL ให้สะอาดแล้วแสดงผล
+            window.location.href = window.location.pathname;
         } catch (e) {
-            console.error('Error loading config:', e);
+            console.error('Error:', e);
         }
     }
 }
